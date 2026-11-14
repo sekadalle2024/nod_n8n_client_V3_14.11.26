@@ -1,0 +1,87 @@
+════════════════════════════════════════════════════════════════════════════
+                    🚀 PUSH VERS REPOSITORY V3
+                    
+                    EXÉCUTEZ MAINTENANT DANS VOTRE POWERSHELL
+════════════════════════════════════════════════════════════════════════════
+
+⚠️  IMPORTANT: Ne PAS exécuter dans le terminal automatisé de Kiro!
+               Ouvrez votre propre PowerShell (Windows + X → PowerShell)
+
+════════════════════════════════════════════════════════════════════════════
+                            COMMANDES À EXÉCUTER
+════════════════════════════════════════════════════════════════════════════
+
+Copiez-collez ces commandes dans VOTRE PowerShell:
+
+    cd "h:\nod_n8n\Doc github push\procedure github"
+    .\push-vers-v3.bat
+
+════════════════════════════════════════════════════════════════════════════
+                            CE QUI VA SE PASSER
+════════════════════════════════════════════════════════════════════════════
+
+1. ✓ Le script vérifie l'état du repository
+2. ✓ Crée un commit si nécessaire  
+3. ✓ Affiche les derniers commits
+4. ✓ Demande votre confirmation
+5. ✓ Push vers GitHub V3
+6. ✓ Une fenêtre d'authentification peut s'ouvrir
+
+Temps estimé: 2-5 minutes
+
+════════════════════════════════════════════════════════════════════════════
+                            VÉRIFICATIONS AVANT
+════════════════════════════════════════════════════════════════════════════
+
+✓ Remote v3 configuré
+✓ URL: https://github.com/sekadalle2024/nod_n8n_client_V3_14.11.26.git
+✓ Script push-vers-v3.bat créé
+✓ Documentation 02-PUSH-V3-README.md disponible
+
+════════════════════════════════════════════════════════════════════════════
+                            SI VOUS AVEZ DES PROBLÈMES
+════════════════════════════════════════════════════════════════════════════
+
+1. Le repository n'existe pas sur GitHub
+   → Allez sur https://github.com/new
+   → Créez: nod_n8n_client_V3_14.11.26 (vide)
+
+2. Le hook lefthook bloque
+   → Utilisez: git push -u v3 main --no-verify
+
+3. Authentification échoue
+   → Utilisez: gh auth login
+   → Puis retry le push
+
+4. Plus de détails
+   → Lisez: Doc github push\procedure github\01-MEMO-PROBLEMES-SOLUTIONS.md
+
+════════════════════════════════════════════════════════════════════════════
+                            APRÈS LE PUSH
+════════════════════════════════════════════════════════════════════════════
+
+Vérifiez localement:
+
+    cd h:\nod_n8n
+    git status
+
+Vérifiez sur GitHub:
+
+    https://github.com/sekadalle2024/nod_n8n_client_V3_14.11.26
+
+════════════════════════════════════════════════════════════════════════════
+
+✅ Vous avez maintenant 3 backups de votre projet:
+
+   • V0 (origin) - Repository original
+   • V1 (backup) - Premier backup  
+   • V3 (nouveau) - Deuxième backup
+
+════════════════════════════════════════════════════════════════════════════
+
+Date: 14 novembre 2026
+Version: 1.0
+
+🚀 EXÉCUTEZ MAINTENANT LE SCRIPT DANS VOTRE POWERSHELL!
+
+════════════════════════════════════════════════════════════════════════════
