@@ -31,7 +31,14 @@ Ce dossier **"Doc demarrer container & serveur"** contient tous les éléments n
    - Logs et débogage
    - Maintenance (backup, nettoyage, mise à jour)
 
-4. **INDEX-DOCUMENTATION.md** (ce fichier)
+4. **03-GUIDE-GIT-GITHUB.md** ⭐ NOUVEAU
+   - Workflow Git complet (quotidien, avancé, urgence)
+   - Scripts Git & GitHub expliqués
+   - Commandes Git utiles
+   - Résolution de problèmes Git/GitHub
+   - Bonnes pratiques et checklist quotidienne
+
+5. **INDEX-DOCUMENTATION.md** (ce fichier)
    - Index de tous les documents
    - Organisation de la documentation
    - Liens vers les autres dossiers
@@ -40,6 +47,8 @@ Ce dossier **"Doc demarrer container & serveur"** contient tous les éléments n
 
 ### 🔧 Scripts Batch (.bat)
 
+#### Scripts de Démarrage
+
 | Script                          | Objectif                                                       | Temps d'exécution |
 | ------------------------------- | -------------------------------------------------------------- | ----------------- |
 | **demarrer-tout-projet.bat** ⭐ | **TOUT-EN-UN** : Démarrer containers + serveur automatiquement | ~1-2 min          |
@@ -47,6 +56,16 @@ Ce dossier **"Doc demarrer container & serveur"** contient tous les éléments n
 | **demarrer-serveur.bat**        | Démarrer uniquement le serveur Node.js (port 4310)             | ~30-60s           |
 | **verifier-etat.bat**           | Vérifier l'état de tous les services                           | ~5s               |
 | **arreter-tout.bat**            | Arrêter proprement tous les services                           | ~10s              |
+
+#### Scripts Git & GitHub
+
+| Script                     | Objectif                                    | Temps d'exécution |
+| -------------------------- | ------------------------------------------- | ----------------- |
+| **commit-et-push.bat** ⭐  | **TOUT-EN-UN** : Commit + Push vers GitHub  | ~2-5 min          |
+| **commit-changes.bat**     | Commit interactif des modifications locales | ~1 min            |
+| **push-to-github.bat**     | Push vers GitHub (avec vérifications)       | ~2-3 min          |
+| **push-no-verify.bat** ⚠️  | Push sans vérifications (bypass hook)       | ~1-2 min          |
+| **install-github-cli.bat** | Installer GitHub CLI (gh) via winget        | ~2-3 min          |
 
 ---
 
