@@ -1,0 +1,1457 @@
+{
+  "name": "Workflow deploy cross reference V1 13.04.26",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Workflow Revision\n",
+        "height": 1088,
+        "width": 3916,
+        "color": 3
+      },
+      "id": "564d1d48-d168-4274-b9ee-0f1fd405c444",
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [64, -336],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Documents for RAG",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Capitaux propres"
+                  },
+                  {
+                    "option": "Charge d'exploitation"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  },
+                  {
+                    "option": "Impôt et taxes"
+                  },
+                  {
+                    "option": "Personnel"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Ventes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document  ",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9d32dedb-c8b0-4f81-a0d6-6fc840b67687",
+      "name": "Cross references",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [-704, -432],
+      "webhookId": "20bcf9fd-b7bb-49de-9707-590a794c4763",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99e8e0a5-a4da-4e55-8d3b-69c7572229ab",
+              "name": "Liste",
+              "value": "Capitaux propres\nCharge d'exploitation\nClient\nDossier permanent\nEvaluation des risques\nFournisseur\nImmobilisations\nImpôt et taxes\nPersonnel\nQuestionnaire de prise de connaissance\nRecos financier\nStock\nTrésorerie\nVentes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-896, -512],
+      "id": "5cedd282-19bc-4847-bab1-a482f735e573",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [4592, 64],
+      "id": "0fb46250-6623-4c0d-85e2-801a7d89f142",
+      "name": "Respond OPTIONS"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cross_reference",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [4384, 272],
+      "id": "fb14f427-194b-4f59-be9b-83360f050085",
+      "name": "Webhook POST",
+      "webhookId": "cross-ref-post"
+    },
+    {
+      "parameters": {
+        "operation": "search"
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [4592, 272],
+      "id": "9c2a604f-b509-496f-bad5-fce66c70aaea",
+      "name": "Rechercher Dossier",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search"
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [4784, 272],
+      "id": "daf98325-7229-48f9-93b0-3ebafff9e838",
+      "name": "Rechercher Fichier",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Vérifier si un fichier a été trouvé\nconst items = $input.all();\n\nif (items.length === 0) {\n  return [\n    {\n      json: {\n        success: false,\n        message: \"Document non trouvé dans Google Drive\",\n        searchTerm: $('Webhook POST').item.json.body.index,\n        dossier: $('Webhook POST').item.json.body.dossier\n      }\n    }\n  ];\n}\n\n// Prendre le premier fichier trouvé\nconst file = items[0].json;\n\nreturn [\n  {\n    json: {\n      success: true,\n      file: {\n        id: file.id,\n        name: file.name,\n        mimeType: file.mimeType,\n        webViewLink: file.webViewLink,\n        webContentLink: file.webContentLink,\n        thumbnailLink: file.thumbnailLink,\n        iconLink: file.iconLink,\n        size: file.size,\n        createdTime: file.createdTime,\n        modifiedTime: file.modifiedTime\n      },\n      searchTerm: $('Webhook POST').item.json.body.index,\n      dossier: $('Webhook POST').item.json.body.dossier\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4992, 272],
+      "id": "75268b21-4919-4101-8422-560703481641",
+      "name": "Formater Réponse"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [5184, 272],
+      "id": "88fd319a-e9f9-4cf8-8864-4ed580922700",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "cross_reference",
+        "responseMode": "lastNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [4384, 64],
+      "id": "1941f808-90d4-4bfe-a6f8-ff86d295069a",
+      "name": "Webhook OPTIONS preflight1",
+      "webhookId": "cross-ref-options"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow Revision\n",
+        "height": 1088,
+        "width": 3916,
+        "color": 3
+      },
+      "id": "5a7f1517-592d-4177-83a6-f0fe85e581f3",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [4032, -320],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Documents pour Cross-Références CAC",
+        "formDescription": "Importer des documents de test d'audit dans Google Drive avec indexation structurée",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Capitaux propres"
+                  },
+                  {
+                    "option": "Charge d'exploitation"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  },
+                  {
+                    "option": "Impôt et taxes"
+                  },
+                  {
+                    "option": "Personnel"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Ventes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bf36286e-beb6-4e72-9530-0352f9446226",
+      "name": "Cross References Form1",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [-960, 528],
+      "webhookId": "5230db4e-ec40-4e97-a9f6-99a239542a25",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "search"
+      },
+      "id": "d91c0925-0468-4c03-8f6c-661d225542a2",
+      "name": "Rechercher Dossier CAC1",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [-752, 528],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "condition-dossier-cac-exists",
+              "leftValue": "={{ $json.files.length }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01f29697-a4af-404b-a30d-a67f48b4a2d8",
+      "name": "Dossier CAC existe?1",
+      "type": "n8n-nodes-base.if",
+      "position": [-560, 528],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Documents pour Cross-Références CAC",
+        "formDescription": "Importer des documents de test d'audit dans Google Drive",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7af1fd35-ce2b-4a3e-ab86-364b19b322a3",
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [400, 64],
+      "webhookId": "4b5a5a71-ae01-40b2-9d2c-7dd636ca35d9",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "operation": "list"
+      },
+      "id": "d7930c75-a329-485b-9da5-f70c23773ab0",
+      "name": "List Dossier CAC",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [608, 64],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "leftValue": "={{ $json.files && $json.files.length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "85775b5e-3ec2-48cf-a9f3-9aadfb9f012d",
+      "name": "Dossier CAC Existe?",
+      "type": "n8n-nodes-base.if",
+      "position": [800, 64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Récupérer l'ID du dossier CAC\nconst dossierCacId = $input.first().json.files ? $input.first().json.files[0].id : $input.first().json.id;\n\n// Récupérer les données du formulaire\nconst formData = $('Form Trigger').first().json;\n\nreturn {\n  json: {\n    dossierCacId: dossierCacId,\n    client: formData.Client,\n    exercice: formData.Exercice,\n    cycle: formData['Cycle comptable'],\n    crossRef: formData['Cross référence'],\n    document: formData.Document\n  }\n};"
+      },
+      "id": "17676002-a302-46ba-b98b-8125853bfb56",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.code",
+      "position": [1200, 64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "list"
+      },
+      "id": "3abdb49e-8b19-490e-8f87-f948fd22dc11",
+      "name": "List Dossier Client",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [1408, 64],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "leftValue": "={{ $json.files && $json.files.length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe96f388-00d0-4768-a490-c78e845d578c",
+      "name": "Dossier Client Existe?",
+      "type": "n8n-nodes-base.if",
+      "position": [1600, 64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Récupérer l'ID du dossier client\nconst dossierClientId = $input.first().json.files ? $input.first().json.files[0].id : $input.first().json.id;\n\n// Récupérer les données préparées\nconst preparedData = $('Prepare Data').first().json;\n\nreturn {\n  json: {\n    ...preparedData,\n    dossierClientId: dossierClientId\n  }\n};"
+      },
+      "id": "182bbb10-04a2-482e-b6f9-13c8a3825ea5",
+      "name": "Prepare Data 2",
+      "type": "n8n-nodes-base.code",
+      "position": [2000, 64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "list"
+      },
+      "id": "8aa9cf27-b22d-4b17-bfca-6b5976d6cba4",
+      "name": "List Cycle",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [2208, 64],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "leftValue": "={{ $json.files && $json.files.length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4381358-dfa2-4a40-85c7-58655fd0d66f",
+      "name": "Cycle Existe?",
+      "type": "n8n-nodes-base.if",
+      "position": [2400, 64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "create"
+      },
+      "id": "45b0c6b0-ff0c-4e81-b4fd-5b98a495946f",
+      "name": "Créer Cycle",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [2608, 224],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Récupérer l'ID du dossier cycle\nconst cycleId = $input.first().json.files ? $input.first().json.files[0].id : $input.first().json.id;\n\n// Récupérer les données préparées\nconst preparedData = $('Prepare Data 2').first().json;\n\nreturn {\n  json: {\n    ...preparedData,\n    cycleId: cycleId\n  }\n};"
+      },
+      "id": "ab86f2b9-0642-4405-a35b-8c58cfaacbff",
+      "name": "Prepare Upload",
+      "type": "n8n-nodes-base.code",
+      "position": [2800, 64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "name": "=[{{ $json.crossRef }}]-{{ $json.document }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "b7cc9240-6d43-4a66-ad66-b87a480e883d",
+      "name": "Upload File",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [3008, 64],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create"
+      },
+      "id": "57f0e848-7b20-4c17-8fbb-1900430a9a90",
+      "name": "Créer Dossier CAC1",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [1008, 224],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create"
+      },
+      "id": "7a966b3c-d909-4548-92b0-9ac742b64453",
+      "name": "Créer Dossier Client1",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [1808, 224],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Workflow Revision\n",
+        "height": 1088,
+        "width": 3916,
+        "color": 3
+      },
+      "id": "8ace582e-8da4-4e49-9e98-2d6ff9f8fb3f",
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [112, 832],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Documents pour Révision (Syscohada)",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client",
+              "defaultValue": "ORANGE",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "defaultValue": "2025",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Capitaux propres"
+                  },
+                  {
+                    "option": "Charge d'exploitation"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  },
+                  {
+                    "option": "Impôt et taxes"
+                  },
+                  {
+                    "option": "Personnel"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Ventes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "defaultValue": "[I10]",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document",
+              "defaultValue": "Proces verbal caisse",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1cc7a693-7d4c-4296-85dc-dd6c3a78b47d",
+      "name": "Cross references Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [432, 1312],
+      "webhookId": "b6565f04-1420-4046-bf9b-8d050f504d3f",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "name='Dossier CAC' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5085d4ac-9531-4fc0-9221-4aa73a01db0b",
+      "name": "Find Dossier CAC",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [656, 1312],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=name='{{ $('Cross references Form').item.json.Client }}-{{ $('Cross references Form').item.json.Exercice }}' and '{{ $json.files[0].id }}' in parents and trashed=false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2d13316c-5281-4298-93be-472da09c65bb",
+      "name": "Find Client Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [864, 1312],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.files.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "9bc30b87-6459-4bb9-aa2f-7674e96b97ef",
+      "name": "Client Folder Exists",
+      "type": "n8n-nodes-base.if",
+      "position": [1088, 1312],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Cross references Form').item.json.Client }}-{{ $('Cross references Form').item.json.Exercice }}"
+            },
+            {
+              "name": "mimeType",
+              "value": "application/vnd.google-apps.folder"
+            },
+            {
+              "name": "parents",
+              "value": "={{ [ $('Find Dossier CAC').item.json.files[0].id ] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4ced63a4-8dc0-429c-8050-37176b135c6c",
+      "name": "Create Client Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1312, 1424],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const cycles = [\n  \"Capitaux propres\", \"Charge d'exploitation\", \"Client\", \n  \"Fournisseur\", \"Immobilisations\", \"Impôt et taxes\", \n  \"Personnel\", \"Stock\", \"Trésorerie\", \"Ventes\"\n];\n\nconst parentId = $input.item.json.id;\n\nreturn cycles.map(cycle => ({\n  json: {\n    cycleName: cycle,\n    parentId: parentId,\n    isTarget: cycle === $('Cross references Form').item.json['Cycle comptable']\n  }\n}));"
+      },
+      "id": "440baed7-f76a-452f-a5ac-b2392e96d351",
+      "name": "Generate Cycles List",
+      "type": "n8n-nodes-base.code",
+      "position": [1536, 1424],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.cycleName }}"
+            },
+            {
+              "name": "mimeType",
+              "value": "application/vnd.google-apps.folder"
+            },
+            {
+              "name": "parents",
+              "value": "={{ [ $json.parentId ] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "555120c7-1ef4-433b-8153-ec983b8d404c",
+      "name": "Create Cycle Folders",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1760, 1424],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.isTarget }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "11a72385-0467-4d28-9084-819484a894b2",
+      "name": "Filter Target Cycle",
+      "type": "n8n-nodes-base.if",
+      "position": [1984, 1424],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=name='{{ $('Cross references Form').item.json['Cycle comptable'] }}' and '{{ $json.files[0].id }}' in parents and trashed=false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "99182926-6e9b-41a5-9a80-dea7a435a35b",
+      "name": "Find Cycle Folder",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1312, 1184],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let targetFolderId;\n\nif ($input.item.json.files) {\n  // Vient de la branche 'Existe déjà'\n  targetFolderId = $input.item.json.files[0].id;\n} else {\n  // Vient de la branche 'Création'\n  targetFolderId = $input.item.json.id;\n}\n\nconst crossRef = $('Cross references Form').item.json['Cross référence'];\nconst docName = $('Cross references Form').item.json.Document;\nconst fileName = `[${crossRef}]-${docName}`;\n\nreturn {\n  json: {\n    targetFolderId: targetFolderId,\n    fileName: fileName\n  }\n};"
+      },
+      "id": "59928379-95cc-4b9f-b68b-de897b7453a9",
+      "name": "Prepare Upload Data",
+      "type": "n8n-nodes-base.code",
+      "position": [2240, 1312],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "form-data-text",
+              "name": "metadata"
+            },
+            {
+              "parameterType": "form-data-binary",
+              "name": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47647330-d33c-41b0-a35f-0e20b1704d78",
+      "name": "Upload File to Drive",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2464, 1312],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook POST": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Fichier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Fichier": {
+      "main": [
+        [
+          {
+            "node": "Formater Réponse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formater Réponse": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook OPTIONS preflight1": {
+      "main": [
+        [
+          {
+            "node": "Respond OPTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cross References Form1": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier CAC1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier CAC1": {
+      "main": [
+        [
+          {
+            "node": "Dossier CAC existe?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dossier CAC existe?1": {
+      "main": [[], []]
+    },
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "List Dossier CAC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Dossier CAC": {
+      "main": [
+        [
+          {
+            "node": "Dossier CAC Existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dossier CAC Existe?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Créer Dossier CAC1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "List Dossier Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Dossier Client": {
+      "main": [
+        [
+          {
+            "node": "Dossier Client Existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dossier Client Existe?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Créer Dossier Client1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data 2": {
+      "main": [
+        [
+          {
+            "node": "List Cycle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Cycle": {
+      "main": [
+        [
+          {
+            "node": "Cycle Existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cycle Existe?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Upload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Créer Cycle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Créer Cycle": {
+      "main": [
+        [
+          {
+            "node": "Prepare Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Upload": {
+      "main": [
+        [
+          {
+            "node": "Upload File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Créer Dossier CAC1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Créer Dossier Client1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cross references Form": {
+      "main": [
+        [
+          {
+            "node": "Find Dossier CAC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Dossier CAC": {
+      "main": [
+        [
+          {
+            "node": "Find Client Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Client Folder": {
+      "main": [
+        [
+          {
+            "node": "Client Folder Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Folder Exists": {
+      "main": [
+        [
+          {
+            "node": "Find Cycle Folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Folder": {
+      "main": [
+        [
+          {
+            "node": "Generate Cycles List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Cycles List": {
+      "main": [
+        [
+          {
+            "node": "Create Cycle Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Cycle Folders": {
+      "main": [
+        [
+          {
+            "node": "Filter Target Cycle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Target Cycle": {
+      "main": [
+        [
+          {
+            "node": "Prepare Upload Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Cycle Folder": {
+      "main": [
+        [
+          {
+            "node": "Prepare Upload Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Upload Data": {
+      "main": [
+        [
+          {
+            "node": "Upload File to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "36d2dd12-a662-4c2d-8193-f7333835984d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9131465eca0291f1ecef4835bf7bafb685a9cf7920533b0125b3fa5b3b4a5df4"
+  },
+  "id": "rqzIeAWLJLM1RzQJ",
+  "tags": []
+}

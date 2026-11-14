@@ -57,19 +57,37 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Verifier si Ubuntu-22.04 existe
-wsl --list --quiet 2>nul | findstr /C:"%WSL_DISTRO%" >nul
-if errorlevel 1 (
-    echo.
-    echo [ERREUR] Ubuntu-22.04 n'est pas installe
-    echo.
-    echo ACTION REQUISE:
-    echo 1. Installez Ubuntu: wsl --install -d Ubuntu-22.04
-    echo 2. Lancez migrate-to-wsl2.ps1
-    echo.
-    pause
-    exit /b 1
+REM Verifier si Ubuntu-22.04 ou docker-desktop est disponible
+REM Essayer d'abord docker-desktop (par defaut dans WSL2)
+wsl --list --quiet 2>nul | findstr /B "docker-desktop" >nul
+if !errorlevel! == 0 (
+    echo [INFO] Utilisation de docker-desktop WSL2
+    set WSL_DISTRO=docker-desktop
+    set WSL_PROJECT=/mnt/h/nod_n8n
+    goto :wsl_detected
 )
+
+REM Essayer Ubuntu-22.04
+wsl --list --quiet 2>nul | findstr /B "Ubuntu-22.04" >nul
+if !errorlevel! == 0 (
+    echo [INFO] Utilisation de Ubuntu-22.04
+    set WSL_DISTRO=Ubuntu-22.04
+    set WSL_PROJECT=/home/root/nod
+    goto :wsl_detected
+)
+
+echo.
+echo [ERREUR] Aucune distribution WSL2 avec Docker disponible
+echo.
+echo ACTION REQUISE:
+echo 1. Installez Ubuntu: wsl --install -d Ubuntu-22.04
+echo 2. Lancez migrate-to-wsl2.ps1
+echo.
+pause
+exit /b 1
+
+:wsl_detected
+echo [OK] Distribution WSL2: %WSL_DISTRO%
 
 echo [OK] WSL2 et Ubuntu-22.04 sont installes
 

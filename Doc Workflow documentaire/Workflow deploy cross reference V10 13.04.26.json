@@ -1,0 +1,1722 @@
+{
+  "name": "Workflow deploy cross reference V10 13.04.26",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Upload Documents for RAG",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Capitaux propres"
+                  },
+                  {
+                    "option": "Charge d'exploitation"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  },
+                  {
+                    "option": "Impôt et taxes"
+                  },
+                  {
+                    "option": "Personnel"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Ventes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document  ",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9d32dedb-c8b0-4f81-a0d6-6fc840b67687",
+      "name": "Cross references",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [-704, -432],
+      "webhookId": "20bcf9fd-b7bb-49de-9707-590a794c4763",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99e8e0a5-a4da-4e55-8d3b-69c7572229ab",
+              "name": "Liste",
+              "value": "Capitaux propres\nCharge d'exploitation\nClient\nDossier permanent\nEvaluation des risques\nFournisseur\nImmobilisations\nImpôt et taxes\nPersonnel\nQuestionnaire de prise de connaissance\nRecos financier\nStock\nTrésorerie\nVentes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-896, -512],
+      "id": "5cedd282-19bc-4847-bab1-a482f735e573",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [4592, 64],
+      "id": "0fb46250-6623-4c0d-85e2-801a7d89f142",
+      "name": "Respond OPTIONS"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cross_reference",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [4384, 272],
+      "id": "fb14f427-194b-4f59-be9b-83360f050085",
+      "name": "Webhook POST",
+      "webhookId": "cross-ref-post"
+    },
+    {
+      "parameters": {
+        "operation": "search"
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [4592, 272],
+      "id": "9c2a604f-b509-496f-bad5-fce66c70aaea",
+      "name": "Rechercher Dossier",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search"
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [4784, 272],
+      "id": "daf98325-7229-48f9-93b0-3ebafff9e838",
+      "name": "Rechercher Fichier",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zHU5DrwS0vQlWHgz",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Vérifier si un fichier a été trouvé\nconst items = $input.all();\n\nif (items.length === 0) {\n  return [\n    {\n      json: {\n        success: false,\n        message: \"Document non trouvé dans Google Drive\",\n        searchTerm: $('Webhook POST').item.json.body.index,\n        dossier: $('Webhook POST').item.json.body.dossier\n      }\n    }\n  ];\n}\n\n// Prendre le premier fichier trouvé\nconst file = items[0].json;\n\nreturn [\n  {\n    json: {\n      success: true,\n      file: {\n        id: file.id,\n        name: file.name,\n        mimeType: file.mimeType,\n        webViewLink: file.webViewLink,\n        webContentLink: file.webContentLink,\n        thumbnailLink: file.thumbnailLink,\n        iconLink: file.iconLink,\n        size: file.size,\n        createdTime: file.createdTime,\n        modifiedTime: file.modifiedTime\n      },\n      searchTerm: $('Webhook POST').item.json.body.index,\n      dossier: $('Webhook POST').item.json.body.dossier\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4992, 272],
+      "id": "75268b21-4919-4101-8422-560703481641",
+      "name": "Formater Réponse"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [5184, 272],
+      "id": "88fd319a-e9f9-4cf8-8864-4ed580922700",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "cross_reference",
+        "responseMode": "lastNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Accept"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [4384, 64],
+      "id": "1941f808-90d4-4bfe-a6f8-ff86d295069a",
+      "name": "Webhook OPTIONS preflight1",
+      "webhookId": "cross-ref-options"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow Revision\n",
+        "height": 1088,
+        "width": 3916,
+        "color": 3
+      },
+      "id": "5a7f1517-592d-4177-83a6-f0fe85e581f3",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [4032, -320],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Documents pour Révision (Syscohada)",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client",
+              "defaultValue": "ORANGE",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "defaultValue": "2025",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Capitaux propres"
+                  },
+                  {
+                    "option": "Charge d'exploitation"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  },
+                  {
+                    "option": "Impôt et taxes"
+                  },
+                  {
+                    "option": "Personnel"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Ventes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "defaultValue": "[I10]",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document",
+              "defaultValue": "Proces verbal caisse",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d0a1548a-febb-4ae8-86fc-49ce7de9569c",
+      "name": "Cross references Form3",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [400, 80],
+      "webhookId": "c6d23115-be22-4e5a-b9b2-29d0712a4e8f",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// EXTRACT FORM DATA — V4\n//\n// DOIT être placé directement après le Form Trigger.\n// C'est le SEUL nœud où item.binary est accessible.\n//\n// On lit le fichier via getBinaryDataBuffer et on le stocke\n// en base64 dans le JSON afin qu'il soit disponible dans\n// tous les nœuds Code en aval via $('Extract Form Data1')\n// sans jamais toucher à .binary (inaccessible en task runner).\n// ============================================================\nconst EXT_MIME = {\n  pdf:  'application/pdf',\n  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n  xls:  'application/vnd.ms-excel',\n  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n  doc:  'application/msword'\n};\n\nconst item = $input.item;\n\nif (!item.binary || Object.keys(item.binary).length === 0) {\n  throw new Error('Aucun fichier reçu dans le formulaire. Vérifiez le champ Files.');\n}\n\nconst binaryKey  = Object.keys(item.binary)[0];\nconst fileBin    = item.binary[binaryKey];\nconst ext        = (fileBin.fileExtension || '').toLowerCase();\nconst mimeType   = EXT_MIME[ext] || 'application/pdf';\nconst fileExt    = ext ? '.' + ext : '';\nconst crossRef   = item.json['Cross référence'];\nconst docName    = item.json['Document'];\nconst fileName   = '[' + crossRef + ']-' + docName + fileExt;\n\n// Lecture du fichier en buffer et conversion base64\nconst buffer = await this.helpers.getBinaryDataBuffer(0, binaryKey);\nconst base64 = buffer.toString('base64');\n\nreturn [{\n  json: {\n    Client:            item.json.Client,\n    Exercice:          item.json.Exercice,\n    'Cycle comptable': item.json['Cycle comptable'],\n    'Cross référence': crossRef,\n    Document:          docName,\n    _fileName:         fileName,\n    _fileExt:          ext,\n    _fileMimeType:     mimeType,\n    _fileBase64:       base64\n  }\n}];"
+      },
+      "id": "ed6b8ee8-2aa5-488a-8095-08c5c1e08da1",
+      "name": "Extract Form Data1",
+      "type": "n8n-nodes-base.code",
+      "position": [624, 80],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "name='Dossier CAC' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f416a9d2-0198-41db-ac55-c3e082354532",
+      "name": "Find Dossier CAC3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [848, 80],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name='\" + $('Extract Form Data1').first().json.Client.trim() + \"-\" + $('Extract Form Data1').first().json.Exercice.toString().trim() + \"' and '\" + $json.files[0].id + \"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e2c3985c-4fc6-4500-9fbe-d987704391e4",
+      "name": "Find Client Folder3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1072, 80],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.files.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "45db0c2d-7fd7-487a-9263-b360313ca856",
+      "name": "Client Folder Exists3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1296, 80]
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name='\" + $('Extract Form Data1').first().json['Cycle comptable'] + \"' and '\" + $json.files[0].id + \"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f46e1ca-99fe-48a4-bff2-15798b24bcab",
+      "name": "Find Cycle Folder3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1504, -64],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// PREPARE UPLOAD (existing) — V4\n// Reconstruit le binaire depuis base64 stocké dans\n// Extract Form Data. Plus aucune référence à .binary.\n// ============================================================\nconst files = $input.item.json.files;\nif (!files || files.length === 0) {\n  throw new Error('Dossier cycle introuvable.');\n}\n\nconst ext      = $('Extract Form Data1').first();\nconst base64   = ext.json._fileBase64;\nconst mimeType = ext.json._fileMimeType;\nconst fileName = ext.json._fileName;\n\n// Reconstruction du binaire avec le bon mimeType\nconst buffer     = Buffer.from(base64, 'base64');\nconst binaryData = await this.helpers.prepareBinaryData(buffer, fileName, mimeType);\n\nreturn [{\n  json: {\n    targetFolderId: files[0].id,\n    fileName:       fileName,\n    mimeType:       mimeType\n  },\n  binary: { data: binaryData }\n}];"
+      },
+      "id": "0d397aa3-ec85-4b64-ae5c-9e5d60785c47",
+      "name": "Prepare Upload (existing)2",
+      "type": "n8n-nodes-base.code",
+      "position": [1728, -64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Upload-Content-Type",
+              "value": "={{ $json.mimeType }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ name: $json.fileName, parents: [$json.targetFolderId] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "8dfd3bc9-a516-408d-b8e2-49730ff1348e",
+      "name": "Initiate Resumable Upload (existing)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1952, -64],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// MERGE UPLOAD URL (existing) — V4\n// Récupère l'URL d'upload depuis les headers de la réponse\n// et rebranche le binaire depuis Prepare Upload (existing)\n// ============================================================\nconst resp      = $input.item.json;\nconst uploadUrl = resp.headers?.location || resp.headers?.Location;\n\nif (!uploadUrl) {\n  throw new Error(\n    'Upload URL introuvable. Headers reçus : ' +\n    JSON.stringify(resp.headers)\n  );\n}\n\nconst prepareItem = $('Prepare Upload (existing)2').first();\n\nreturn [{\n  json: {\n    uploadUrl: uploadUrl,\n    fileName:  prepareItem.json.fileName,\n    mimeType:  prepareItem.json.mimeType\n  },\n  binary: { data: prepareItem.binary.data }\n}];"
+      },
+      "id": "ebd44a9e-0c39-43ee-a8ad-6341c9505f59",
+      "name": "Merge Upload URL (existing)1",
+      "type": "n8n-nodes-base.code",
+      "position": [2176, -64],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.uploadUrl }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "={{ $json.mimeType }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "86289341-bc96-456f-b45c-f8bbbdf371ba",
+      "name": "Upload File (existing folder)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2384, -64],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Extract Form Data1').first().json.Client.trim() + '-' + $('Extract Form Data1').first().json.Exercice.toString().trim() }}"
+            },
+            {
+              "name": "mimeType",
+              "value": "application/vnd.google-apps.folder"
+            },
+            {
+              "name": "parents",
+              "value": "={{ [ $('Find Dossier CAC3').first().json.files[0].id ] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2e63f9f2-0208-4e68-bf2e-96117b4169de",
+      "name": "Create Client Folder3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1504, 224],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// GENERATE CYCLES LIST — V4 CORRIGÉ\n// Ne touche plus à .binary.\n// Toutes les données viennent de Extract Form Data (JSON).\n// BUG CORRIGÉ : $input.item.json.id au lieu de $[input.item.json.id]\n// ============================================================\nconst cycles = [\n  \"Capitaux propres\", \"Charge d'exploitation\", \"Client\",\n  \"Fournisseur\", \"Immobilisations\", \"Impôt et taxes\",\n  \"Personnel\", \"Stock\", \"Trésorerie\", \"Ventes\"\n];\n\nconst clientFolderId = $input.item.json.id;\nif (!clientFolderId) throw new Error('ID dossier client manquant.');\n\nconst ext         = $('Extract Form Data1').first();\nconst targetCycle = ext.json['Cycle comptable'];\nconst fileName    = ext.json._fileName;\nconst mimeType    = ext.json._fileMimeType;\n\nreturn cycles.map(cycle => ({\n  json: {\n    cycleName:   cycle,\n    parentId:    clientFolderId,\n    targetCycle: targetCycle,\n    fileName:    fileName,\n    mimeType:    mimeType\n  }\n}));"
+      },
+      "id": "cd85e488-dfaa-4145-92e3-60075245f691",
+      "name": "Generate Cycles List3",
+      "type": "n8n-nodes-base.code",
+      "position": [1728, 224],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.cycleName }}"
+            },
+            {
+              "name": "mimeType",
+              "value": "application/vnd.google-apps.folder"
+            },
+            {
+              "name": "parents",
+              "value": "={{ [ $json.parentId ] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1ba54213-7744-4f61-90e7-a1cf96d3c1ba",
+      "name": "Create Cycle Folders3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1952, 224],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// FILTER + PREPARE UPLOAD (new) — V4 CORRIGÉ\n// Reconstruit le binaire depuis base64 stocké dans Extract Form Data.\n// BUG CORRIGÉ : item.json.name et matchingFolder.json.id\n// sans syntaxe markdown parasite.\n// ============================================================\nconst createdFolders = $input.all();\nconst cyclesMeta     = $('Generate Cycles List3').all();\n\nif (!cyclesMeta || cyclesMeta.length === 0) {\n  throw new Error('Aucune donnée trouvée dans Generate Cycles List2.');\n}\n\nconst targetCycle = cyclesMeta[0].json.targetCycle;\nconst fileName    = cyclesMeta[0].json.fileName;\nconst mimeType    = cyclesMeta[0].json.mimeType;\n\nconst matchingFolder = createdFolders.find(item => item.json.name === targetCycle);\nif (!matchingFolder) {\n  throw new Error(\n    `Dossier \"${targetCycle}\" introuvable. ` +\n    `Dossiers créés : ${createdFolders.map(i => i.json.name).join(', ')}`\n  );\n}\n\n// Reconstruction du binaire depuis Extract Form Data\nconst ext    = $('Extract Form Data1').first();\nconst base64 = ext.json._fileBase64;\n\nconst buffer     = Buffer.from(base64, 'base64');\nconst binaryData = await this.helpers.prepareBinaryData(buffer, fileName, mimeType);\n\nreturn [{\n  json: {\n    targetFolderId: matchingFolder.json.id,\n    fileName:       fileName,\n    mimeType:       mimeType\n  },\n  binary: { data: binaryData }\n}];"
+      },
+      "id": "d1a11cee-00d4-47f9-9503-5c7cef3340b3",
+      "name": "Filter + Prepare Upload (new)2",
+      "type": "n8n-nodes-base.code",
+      "position": [2176, 224],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Upload-Content-Type",
+              "value": "={{ $json.mimeType }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ name: $json.fileName, parents: [$json.targetFolderId] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "51501e25-5cf2-423c-862b-6becdff85472",
+      "name": "Initiate Resumable Upload (new)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2384, 224],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// MERGE UPLOAD URL (new) — V4\n// Récupère l'URL d'upload depuis les headers de la réponse\n// et rebranche le binaire depuis Filter + Prepare Upload (new)\n// ============================================================\nconst resp      = $input.item.json;\nconst uploadUrl = resp.headers?.location || resp.headers?.Location;\n\nif (!uploadUrl) {\n  throw new Error(\n    'Upload URL introuvable. Headers reçus : ' +\n    JSON.stringify(resp.headers)\n  );\n}\n\nconst prepareItem = $('Filter + Prepare Upload (new)2').first();\n\nreturn [{\n  json: {\n    uploadUrl: uploadUrl,\n    fileName:  prepareItem.json.fileName,\n    mimeType:  prepareItem.json.mimeType\n  },\n  binary: { data: prepareItem.binary.data }\n}];"
+      },
+      "id": "94486a8b-f3c1-41c6-a111-0ea3fb26bb37",
+      "name": "Merge Upload URL (new)1",
+      "type": "n8n-nodes-base.code",
+      "position": [2608, 224],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.uploadUrl }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "={{ $json.mimeType }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "92f57823-6103-48e0-a1cc-b91c3bacb97f",
+      "name": "Upload File (new folder)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2832, 224],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Workflow CLAUDE V4\n",
+        "height": 1088,
+        "width": 3916,
+        "color": 3
+      },
+      "id": "0230a8dc-5ca0-425f-9578-802efd888e79",
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-80, -320],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Workflow CLAUDE V5\n",
+        "height": 1088,
+        "width": 3916,
+        "color": 3
+      },
+      "id": "145c4468-195c-4590-b644-7774b0243fa8",
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [32, 848],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Documents pour Révision (Syscohada)",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx,.xls,.pdf,.doc,.docx",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Client",
+              "defaultValue": "ORANGE",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Exercice",
+              "defaultValue": "2025",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cycle comptable",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Capitaux propres"
+                  },
+                  {
+                    "option": "Charge d'exploitation"
+                  },
+                  {
+                    "option": "Client"
+                  },
+                  {
+                    "option": "Fournisseur"
+                  },
+                  {
+                    "option": "Immobilisations"
+                  },
+                  {
+                    "option": "Impôt et taxes"
+                  },
+                  {
+                    "option": "Personnel"
+                  },
+                  {
+                    "option": "Stock"
+                  },
+                  {
+                    "option": "Trésorerie"
+                  },
+                  {
+                    "option": "Ventes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cross référence",
+              "defaultValue": "[I10]",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Document",
+              "defaultValue": "Proces verbal caisse",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9ca46be2-35ba-44d0-8c91-5ee5d7627828",
+      "name": "Cross references Form2",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [512, 1232],
+      "webhookId": "495ef51b-4fc9-4b18-bbc9-31bce6cbf71d",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// EXTRACT FORM DATA — V5\n// Normalise le nom client en MAJUSCULES pour éviter les\n// incohérences de casse lors des recherches Drive.\n// ============================================================\nconst EXT_MIME = {\n  pdf:  'application/pdf',\n  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',\n  xls:  'application/vnd.ms-excel',\n  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',\n  doc:  'application/msword'\n};\n\nconst item = $input.item;\n\nif (!item.binary || Object.keys(item.binary).length === 0) {\n  throw new Error('Aucun fichier reçu. Vérifiez le champ Files du formulaire.');\n}\n\nconst binaryKey = Object.keys(item.binary)[0];\nconst fileBin   = item.binary[binaryKey];\nconst ext       = (fileBin.fileExtension || '').toLowerCase();\nconst mimeType  = EXT_MIME[ext] || 'application/pdf';\nconst fileExt   = ext ? '.' + ext : '';\nconst crossRef  = item.json['Cross référence'];\nconst docName   = item.json['Document'];\nconst fileName  = '[' + crossRef + ']-' + docName + fileExt;\n\nconst buffer = await this.helpers.getBinaryDataBuffer(0, binaryKey);\nconst base64 = buffer.toString('base64');\n\nreturn [{\n  json: {\n    Client:            item.json.Client.trim().toUpperCase(),\n    Exercice:          item.json.Exercice.toString().trim(),\n    'Cycle comptable': item.json['Cycle comptable'],\n    'Cross référence': crossRef,\n    Document:          docName,\n    _fileName:         fileName,\n    _fileExt:          ext,\n    _fileMimeType:     mimeType,\n    _fileBase64:       base64\n  }\n}];"
+      },
+      "id": "99076d67-f5f2-4129-8a65-25722482ceb1",
+      "name": "Extract Form Data",
+      "type": "n8n-nodes-base.code",
+      "position": [736, 1232],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "name='Dossier CAC' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0e2f1a94-e958-4524-830b-51ca008d9de0",
+      "name": "Find Dossier CAC2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [864, 1136],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// EXTRACT CAC ID — V5  [NOUVEAU NŒUD ANTI-DOUBLON]\n//\n// Problème corrigé :\n//   Dans Find Client Folder2, l'expression $json.files[0].id\n//   pouvait échouer silencieusement si Dossier CAC n'était\n//   pas trouvé → Find Client Folder2 retournait files:[] →\n//   Client Folder Exists2 basculait sur FALSE → création\n//   d'un doublon à chaque exécution.\n//\n// Ce nœud :\n//   1. Valide explicitement que Dossier CAC existe (erreur claire sinon)\n//   2. Extrait cacId de façon fiable\n//   3. Construit folderName normalisé (déjà en uppercase)\n//   4. Expose cacId et folderName comme champs JSON simples\n//      → Find Client Folder2 utilise $json.cacId et $json.folderName\n//        sans expression imbriquée risquée\n// ============================================================\n\nconst cacData = $input.item.json;\n\nif (!cacData.files || cacData.files.length === 0) {\n  throw new Error(\n    'Dossier CAC introuvable dans Google Drive. ' +\n    'Créez un dossier nommé exactement \"Dossier CAC\" à la racine de Mon Drive.'\n  );\n}\n\nconst cacId = cacData.files[0].id;\n\nconst ext        = $('Extract Form Data').first().json;\nconst clientName = ext.Client;    // déjà en MAJUSCULES\nconst exercice   = ext.Exercice;\nconst folderName = clientName + '-' + exercice;\n\nreturn [{\n  json: {\n    cacId:      cacId,\n    folderName: folderName\n  }\n}];"
+      },
+      "id": "898a59c3-33e9-435c-9096-2166dd300534",
+      "name": "Extract CAC ID",
+      "type": "n8n-nodes-base.code",
+      "position": [1072, 1232],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name='\" + $json.folderName + \"' and '\" + $json.cacId + \"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "732506e1-df8a-494f-ae65-defb3d9c9b8e",
+      "name": "Find Client Folder2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1296, 1232],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.files.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "622093b0-64ab-417f-96e3-6c4e077f919e",
+      "name": "Client Folder Exists2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1520, 1232]
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ \"name='\" + $('Extract Form Data').first().json['Cycle comptable'] + \"' and '\" + $json.files[0].id + \"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false\" }}"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9aeba6df-613a-4ae7-b0c3-02faac7269f0",
+      "name": "Find Cycle Folder2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1728, 1088],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// PREPARE UPLOAD (existing) — V5\n// ============================================================\nconst files = $input.item.json.files;\nif (!files || files.length === 0) {\n  throw new Error('Dossier cycle introuvable dans le dossier client existant.');\n}\n\nconst ext      = $('Extract Form Data').first();\nconst base64   = ext.json._fileBase64;\nconst mimeType = ext.json._fileMimeType;\nconst fileName = ext.json._fileName;\n\nconst buffer     = Buffer.from(base64, 'base64');\nconst binaryData = await this.helpers.prepareBinaryData(buffer, fileName, mimeType);\n\nreturn [{\n  json: {\n    targetFolderId: files[0].id,\n    fileName:       fileName,\n    mimeType:       mimeType\n  },\n  binary: { data: binaryData }\n}];"
+      },
+      "id": "50052f5b-1bb8-480d-b56c-67ef6b2e4e38",
+      "name": "Prepare Upload (existing)1",
+      "type": "n8n-nodes-base.code",
+      "position": [1952, 1088],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Upload-Content-Type",
+              "value": "={{ $json.mimeType }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ name: $json.fileName, parents: [$json.targetFolderId] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "1b939b3c-5249-4394-afa5-372dfc6e652a",
+      "name": "Initiate Resumable Upload (existing)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2176, 1088],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// MERGE UPLOAD URL (existing) — V5\n// ============================================================\nconst resp      = $input.item.json;\nconst uploadUrl = resp.headers?.location || resp.headers?.Location;\n\nif (!uploadUrl) {\n  throw new Error('Upload URL introuvable. Headers : ' + JSON.stringify(resp.headers));\n}\n\nconst prepareItem = $('Prepare Upload (existing)1').first();\n\nreturn [{\n  json: {\n    uploadUrl: uploadUrl,\n    fileName:  prepareItem.json.fileName,\n    mimeType:  prepareItem.json.mimeType\n  },\n  binary: { data: prepareItem.binary.data }\n}];"
+      },
+      "id": "e66951e5-6d0f-4ce5-928d-14784b6d98b8",
+      "name": "Merge Upload URL (existing)",
+      "type": "n8n-nodes-base.code",
+      "position": [2400, 1088],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.uploadUrl }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "={{ $json.mimeType }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "32e05398-dd4c-4e6c-bf55-d96b71112ee7",
+      "name": "Upload File (existing folder)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2624, 1088],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Extract CAC ID').first().json.folderName }}"
+            },
+            {
+              "name": "mimeType",
+              "value": "application/vnd.google-apps.folder"
+            },
+            {
+              "name": "parents",
+              "value": "={{ [ $('Extract CAC ID').first().json.cacId ] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0890467d-da1a-4f63-9bbb-70fb5b4104de",
+      "name": "Create Client Folder2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1728, 1376],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// GENERATE CYCLES LIST — V5 CORRIGÉ\n// BUG CORRIGÉ : $input.item.json.id (syntaxe JS correcte)\n// ============================================================\nconst cycles = [\n  \"Capitaux propres\", \"Charge d'exploitation\", \"Client\",\n  \"Fournisseur\", \"Immobilisations\", \"Impôt et taxes\",\n  \"Personnel\", \"Stock\", \"Trésorerie\", \"Ventes\"\n];\n\nconst clientFolderId = $input.item.json.id;\nif (!clientFolderId) throw new Error('ID dossier client manquant après création.');\n\nconst ext         = $('Extract Form Data').first();\nconst targetCycle = ext.json['Cycle comptable'];\nconst fileName    = ext.json._fileName;\nconst mimeType    = ext.json._fileMimeType;\n\nreturn cycles.map(cycle => ({\n  json: {\n    cycleName:   cycle,\n    parentId:    clientFolderId,\n    targetCycle: targetCycle,\n    fileName:    fileName,\n    mimeType:    mimeType\n  }\n}));"
+      },
+      "id": "ed389ac7-4bff-4cdd-874e-996f9874f577",
+      "name": "Generate Cycles List2",
+      "type": "n8n-nodes-base.code",
+      "position": [1952, 1376],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.cycleName }}"
+            },
+            {
+              "name": "mimeType",
+              "value": "application/vnd.google-apps.folder"
+            },
+            {
+              "name": "parents",
+              "value": "={{ [ $json.parentId ] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5babbd22-32fb-499c-a783-5da731f8cee9",
+      "name": "Create Cycle Folders2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2176, 1376],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// FILTER + PREPARE UPLOAD (new) — V5 CORRIGÉ\n// BUG CORRIGÉ : item.json.name et matchingFolder.json.id\n// ============================================================\nconst createdFolders = $input.all();\nconst cyclesMeta     = $('Generate Cycles List2').all();\n\nif (!cyclesMeta || cyclesMeta.length === 0) {\n  throw new Error('Aucune donnée trouvée dans Generate Cycles List2.');\n}\n\nconst targetCycle = cyclesMeta[0].json.targetCycle;\nconst fileName    = cyclesMeta[0].json.fileName;\nconst mimeType    = cyclesMeta[0].json.mimeType;\n\nconst matchingFolder = createdFolders.find(item => item.json.name === targetCycle);\nif (!matchingFolder) {\n  throw new Error(\n    `Dossier \"${targetCycle}\" introuvable parmi les dossiers créés : ` +\n    createdFolders.map(i => i.json.name).join(', ')\n  );\n}\n\nconst ext    = $('Extract Form Data').first();\nconst base64 = ext.json._fileBase64;\n\nconst buffer     = Buffer.from(base64, 'base64');\nconst binaryData = await this.helpers.prepareBinaryData(buffer, fileName, mimeType);\n\nreturn [{\n  json: {\n    targetFolderId: matchingFolder.json.id,\n    fileName:       fileName,\n    mimeType:       mimeType\n  },\n  binary: { data: binaryData }\n}];"
+      },
+      "id": "44f4c0c6-e4ae-433e-a8e9-41cf84ee5eb6",
+      "name": "Filter + Prepare Upload (new)1",
+      "type": "n8n-nodes-base.code",
+      "position": [2400, 1376],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Upload-Content-Type",
+              "value": "={{ $json.mimeType }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ name: $json.fileName, parents: [$json.targetFolderId] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "cc391255-0b88-4ba3-979b-12276ad99305",
+      "name": "Initiate Resumable Upload (new)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [2624, 1376],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// MERGE UPLOAD URL (new) — V5\n// ============================================================\nconst resp      = $input.item.json;\nconst uploadUrl = resp.headers?.location || resp.headers?.Location;\n\nif (!uploadUrl) {\n  throw new Error('Upload URL introuvable. Headers : ' + JSON.stringify(resp.headers));\n}\n\nconst prepareItem = $('Filter + Prepare Upload (new)1').first();\n\nreturn [{\n  json: {\n    uploadUrl: uploadUrl,\n    fileName:  prepareItem.json.fileName,\n    mimeType:  prepareItem.json.mimeType\n  },\n  binary: { data: prepareItem.binary.data }\n}];"
+      },
+      "id": "2a6a9067-f5d2-4b3b-a3aa-b6237999e900",
+      "name": "Merge Upload URL (new)",
+      "type": "n8n-nodes-base.code",
+      "position": [2848, 1376],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.uploadUrl }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "={{ $json.mimeType }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "a41d0374-56f0-4ba0-91dd-6b0fa82900d2",
+      "name": "Upload File (new folder)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [3072, 1376],
+      "typeVersion": 4.1,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "hpBIKlyakA5Q1lOP",
+          "name": "Unnamed credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook POST": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Dossier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Dossier": {
+      "main": [
+        [
+          {
+            "node": "Rechercher Fichier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rechercher Fichier": {
+      "main": [
+        [
+          {
+            "node": "Formater Réponse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formater Réponse": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook OPTIONS preflight1": {
+      "main": [
+        [
+          {
+            "node": "Respond OPTIONS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cross references Form3": {
+      "main": [
+        [
+          {
+            "node": "Extract Form Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Form Data1": {
+      "main": [
+        [
+          {
+            "node": "Find Dossier CAC3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Dossier CAC3": {
+      "main": [
+        [
+          {
+            "node": "Find Client Folder3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Client Folder3": {
+      "main": [
+        [
+          {
+            "node": "Client Folder Exists3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Folder Exists3": {
+      "main": [
+        [
+          {
+            "node": "Find Cycle Folder3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client Folder3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Cycle Folder3": {
+      "main": [
+        [
+          {
+            "node": "Prepare Upload (existing)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Upload (existing)2": {
+      "main": [
+        [
+          {
+            "node": "Initiate Resumable Upload (existing)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Resumable Upload (existing)1": {
+      "main": [
+        [
+          {
+            "node": "Merge Upload URL (existing)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Upload URL (existing)1": {
+      "main": [
+        [
+          {
+            "node": "Upload File (existing folder)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Folder3": {
+      "main": [
+        [
+          {
+            "node": "Generate Cycles List3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Cycles List3": {
+      "main": [
+        [
+          {
+            "node": "Create Cycle Folders3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Cycle Folders3": {
+      "main": [
+        [
+          {
+            "node": "Filter + Prepare Upload (new)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter + Prepare Upload (new)2": {
+      "main": [
+        [
+          {
+            "node": "Initiate Resumable Upload (new)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Resumable Upload (new)1": {
+      "main": [
+        [
+          {
+            "node": "Merge Upload URL (new)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Upload URL (new)1": {
+      "main": [
+        [
+          {
+            "node": "Upload File (new folder)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cross references Form2": {
+      "main": [
+        [
+          {
+            "node": "Extract Form Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Form Data": {
+      "main": [
+        [
+          {
+            "node": "Find Dossier CAC2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Dossier CAC2": {
+      "main": [
+        [
+          {
+            "node": "Extract CAC ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract CAC ID": {
+      "main": [
+        [
+          {
+            "node": "Find Client Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Client Folder2": {
+      "main": [
+        [
+          {
+            "node": "Client Folder Exists2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Folder Exists2": {
+      "main": [
+        [
+          {
+            "node": "Find Cycle Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Cycle Folder2": {
+      "main": [
+        [
+          {
+            "node": "Prepare Upload (existing)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Upload (existing)1": {
+      "main": [
+        [
+          {
+            "node": "Initiate Resumable Upload (existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Resumable Upload (existing)": {
+      "main": [
+        [
+          {
+            "node": "Merge Upload URL (existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Upload URL (existing)": {
+      "main": [
+        [
+          {
+            "node": "Upload File (existing folder)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Folder2": {
+      "main": [
+        [
+          {
+            "node": "Generate Cycles List2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Cycles List2": {
+      "main": [
+        [
+          {
+            "node": "Create Cycle Folders2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Cycle Folders2": {
+      "main": [
+        [
+          {
+            "node": "Filter + Prepare Upload (new)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter + Prepare Upload (new)1": {
+      "main": [
+        [
+          {
+            "node": "Initiate Resumable Upload (new)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Resumable Upload (new)": {
+      "main": [
+        [
+          {
+            "node": "Merge Upload URL (new)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Upload URL (new)": {
+      "main": [
+        [
+          {
+            "node": "Upload File (new folder)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e175ad9c-97f1-4992-a135-5608595f9853",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9131465eca0291f1ecef4835bf7bafb685a9cf7920533b0125b3fa5b3b4a5df4"
+  },
+  "id": "rqzIeAWLJLM1RzQJ",
+  "tags": []
+}
