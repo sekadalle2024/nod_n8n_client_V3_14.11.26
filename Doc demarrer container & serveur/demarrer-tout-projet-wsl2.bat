@@ -203,10 +203,30 @@ REM ========================================
 echo.
 echo [5/6] Attente de PostgreSQL (peut prendre jusqu'a 120 secondes avec fsync^)...
 
+REM Detecter le nom du container PostgreSQL
+echo [INFO] Detection du container PostgreSQL...
+for /f "delims=" %%i in ('wsl -d %WSL_DISTRO% --exec bash -c "docker ps --filter name=postgres --filter name=nod --format {{.Names}} 2>/dev/null | head -n1"') do set POSTGRES_CONTAINER=%%i
+
+if "%POSTGRES_CONTAINER%"=="" (
+    echo [ERREUR] Container PostgreSQL introuvable
+    echo.
+    echo DIAGNOSTIC:
+    wsl -d %WSL_DISTRO% --exec bash -c "docker ps -a --filter name=nod"
+    echo.
+    echo SOLUTIONS:
+    echo 1. Verifiez que docker compose up a reussi
+    echo 2. Verifiez les logs: wsl -d %WSL_DISTRO% docker compose logs
+    echo.
+    pause
+    exit /b 1
+)
+
+echo [INFO] Container PostgreSQL detecte: %POSTGRES_CONTAINER%
+
 REM Attendre que PostgreSQL soit pret (max 120 secondes)
 set /a count=0
 :wait_postgres
-wsl -d %WSL_DISTRO% --exec bash -c "docker exec nod-local-postgres-1 pg_isready -U nod" >nul 2>&1
+wsl -d %WSL_DISTRO% --exec bash -c "docker exec %POSTGRES_CONTAINER% pg_isready -U nod" >nul 2>&1
 if errorlevel 1 (
     set /a count+=1
     if !count! LSS 120 (
@@ -222,11 +242,11 @@ if errorlevel 1 (
         echo [ERREUR] PostgreSQL ne repond pas apres 120 secondes
         echo.
         echo DIAGNOSTIC:
-        wsl -d %WSL_DISTRO% --exec bash -c "docker logs --tail=30 nod-local-postgres-1"
+        wsl -d %WSL_DISTRO% --exec bash -c "docker logs --tail=30 %POSTGRES_CONTAINER%"
         echo.
         echo SOLUTIONS:
         echo 1. PostgreSQL peut prendre 90-95s avec fsync active
-        echo 2. Verifiez les logs complets: wsl -d %WSL_DISTRO% docker logs nod-local-postgres-1
+        echo 2. Verifiez les logs complets: wsl -d %WSL_DISTRO% docker logs %POSTGRES_CONTAINER%
         echo 3. Verifiez l'etat: wsl -d %WSL_DISTRO% docker ps -a
         echo.
         pause

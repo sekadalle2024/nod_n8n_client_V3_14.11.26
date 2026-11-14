@@ -373,11 +373,41 @@ try {
     Invoke-WSLCommand -Distro $WSL_DISTRO -Command "echo '$wslConfigEscaped' | sudo tee /etc/wsl.conf > /dev/null" -Silent
     
     Write-Success "systemd active dans WSL2"
-    Write-Info "Un redemarrage de WSL2 sera necessaire"
+    Write-Info "Redemarrage de WSL2 pour activer systemd..."
     
-    # Enable Docker service
+    # Shutdown WSL2 to apply systemd configuration
+    wsl --shutdown
+    Start-Sleep -Seconds 5
+    
+    # Wait for WSL2 to be ready after restart
+    Write-Info "Redemarrage de WSL2 en cours..."
+    $maxRetries = 10
+    $retryCount = 0
+    $wslReady = $false
+    
+    while (-not $wslReady -and $retryCount -lt $maxRetries) {
+        try {
+            $testResult = wsl -d $WSL_DISTRO --exec bash -c "echo OK" 2>$null
+            if ($testResult -match "OK") {
+                $wslReady = $true
+            }
+        }
+        catch {
+            Start-Sleep -Seconds 2
+            $retryCount++
+        }
+    }
+    
+    if (-not $wslReady) {
+        Write-Error-Custom "WSL2 ne repond pas apres redemarrage"
+        exit 1
+    }
+    
+    Write-Success "WSL2 redemarre avec systemd"
+    
+    # Enable Docker service with systemctl (now that systemd is active)
     Invoke-WSLCommand -Distro $WSL_DISTRO -Command "sudo systemctl enable docker 2>/dev/null || true" -Silent
-    Write-Success "Service Docker configure pour auto-start"
+    Write-Success "Service Docker configure pour auto-start avec systemd"
 }
 catch {
     Write-Info "Configuration systemd impossible, utilisez: sudo service docker start"
@@ -483,6 +513,35 @@ try {
     }
     else {
         Write-Info "Test hello-world ignore (daemon peut-etre pas encore pret)"
+    }
+    
+    # Test Windows mount access (critical for project files)
+    Write-Info "Verification de l'acces au projet via /mnt/h/nod_n8n..."
+    $mountTest = wsl -d $WSL_DISTRO --exec bash -c "test -f /mnt/h/nod_n8n/compose.yaml && echo OK || echo FAIL" 2>&1
+    
+    if ($mountTest -match "OK") {
+        Write-Success "Acces au projet via /mnt/h/ confirme"
+    }
+    else {
+        Write-Host "`n========================================" -ForegroundColor Red
+        Write-Host "ERREUR: Docker ne peut pas acceder au projet" -ForegroundColor Red
+        Write-Host "========================================" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Le fichier compose.yaml n'est pas accessible via /mnt/h/nod_n8n" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "SOLUTIONS:" -ForegroundColor White
+        Write-Host "1. Verifiez que le disque H: est bien monte dans WSL2:" -ForegroundColor Cyan
+        Write-Host "   wsl -d $WSL_DISTRO --exec ls /mnt/h/" -ForegroundColor Gray
+        Write-Host ""
+        Write-Host "2. Verifiez les permissions du dossier:" -ForegroundColor Cyan
+        Write-Host "   wsl -d $WSL_DISTRO --exec ls -la /mnt/h/nod_n8n/" -ForegroundColor Gray
+        Write-Host ""
+        Write-Host "3. Si /mnt/h/ n'existe pas, ajoutez dans /etc/wsl.conf:" -ForegroundColor Cyan
+        Write-Host "   [automount]" -ForegroundColor Gray
+        Write-Host "   enabled = true" -ForegroundColor Gray
+        Write-Host "   puis: wsl --shutdown" -ForegroundColor Gray
+        Write-Host ""
+        exit 1
     }
 }
 catch {
